@@ -5,7 +5,9 @@ import cv2
 
 # define a dictionary that maps the indexes of the facial
 # landmarks to specific face regions
-FACIAL_LANDMARKS_IDXS = OrderedDict([
+
+#For dlib’s 68-point facial landmark detector:
+FACIAL_LANDMARKS_68_IDXS = OrderedDict([
 	("mouth", (48, 68)),
 	("right_eyebrow", (17, 22)),
 	("left_eyebrow", (22, 27)),
@@ -14,6 +16,17 @@ FACIAL_LANDMARKS_IDXS = OrderedDict([
 	("nose", (27, 36)),
 	("jaw", (0, 17))
 ])
+
+#For dlib’s 5-point facial landmark detector:
+FACIAL_LANDMARKS_5_IDXS = OrderedDict([
+	("right_eye", (2, 3)),
+	("left_eye", (0, 1)),
+	("nose", (4))
+])
+
+# in order to support legacy code, we'll default the indexes to the
+# 68-point model
+FACIAL_LANDMARKS_IDXS = FACIAL_LANDMARKS_68_IDXS
 
 def rect_to_bb(rect):
 	# take a bounding predicted by dlib and convert it
@@ -29,11 +42,11 @@ def rect_to_bb(rect):
 
 def shape_to_np(shape, dtype="int"):
 	# initialize the list of (x, y)-coordinates
-	coords = np.zeros((68, 2), dtype=dtype)
+	coords = np.zeros((shape.num_parts, 2), dtype=dtype)
 
-	# loop over the 68 facial landmarks and convert them
+	# loop over all facial landmarks and convert them
 	# to a 2-tuple of (x, y)-coordinates
-	for i in range(0, 68):
+	for i in range(0, shape.num_parts):
 		coords[i] = (shape.part(i).x, shape.part(i).y)
 
 	# return the list of (x, y)-coordinates
